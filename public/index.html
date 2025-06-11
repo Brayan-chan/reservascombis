@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Combis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-dark': '#4B4ABF'
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+    <!-- Navigation Responsive -->
+    <nav class="bg-primary border-gray-200 dark:bg-gray-900">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
+                <i class="fas fa-bus text-2xl text-white"></i>
+                <span class="self-center text-xl font-semibold whitespace-nowrap text-white">Sistema de Combis</span>
+            </a>
+            <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg md:hidden hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
+                <span class="sr-only">Abrir menú principal</span>
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                </svg>
+            </button>
+            <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+                <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-primary md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-primary dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                    <li>
+                        <button onclick="showSection('dashboard')" class="nav-btn block py-2 px-3 text-white bg-primary-dark rounded md:bg-transparent md:text-white md:p-0 md:hover:text-gray-200 transition-colors" aria-current="page">
+                            <i class="fas fa-tachometer-alt mr-2"></i>
+                            <span class="md:hidden lg:inline">Dashboard</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('combis')" class="nav-btn block py-2 px-3 text-white rounded hover:bg-primary-dark md:hover:bg-transparent md:border-0 md:hover:text-gray-200 md:p-0 transition-colors">
+                            <i class="fas fa-bus mr-2"></i>
+                            <span class="md:hidden lg:inline">Combis</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('choferes')" class="nav-btn block py-2 px-3 text-white rounded hover:bg-primary-dark md:hover:bg-transparent md:border-0 md:hover:text-gray-200 md:p-0 transition-colors">
+                            <i class="fas fa-user-tie mr-2"></i>
+                            <span class="md:hidden lg:inline">Choferes</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('rutas')" class="nav-btn block py-2 px-3 text-white rounded hover:bg-primary-dark md:hover:bg-transparent md:border-0 md:hover:text-gray-200 md:p-0 transition-colors">
+                            <i class="fas fa-route mr-2"></i>
+                            <span class="md:hidden lg:inline">Rutas</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('reservas')" class="nav-btn block py-2 px-3 text-white rounded hover:bg-primary-dark md:hover:bg-transparent md:border-0 md:hover:text-gray-200 md:p-0 transition-colors">
+                            <i class="fas fa-ticket-alt mr-2"></i>
+                            <span class="md:hidden lg:inline">Reservas</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toast Container for Custom Alerts -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="section">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard Administrativo</h2>
+                <p class="text-gray-600 dark:text-gray-400">Resumen general de la operación</p>
+            </div>
+
+            <!-- Métricas principales -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
+                            <i class="fas fa-users text-blue-600 dark:text-blue-300"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pasajeros Hoy</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="pasajeros-hoy">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 dark:bg-green-900">
+                            <i class="fas fa-dollar-sign text-green-600 dark:text-green-300"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Ingresos Hoy</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="ingresos-hoy">$0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900">
+                            <i class="fas fa-bus text-yellow-600 dark:text-yellow-300"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Viajes Hoy</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="viajes-hoy">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-100 dark:bg-red-900">
+                            <i class="fas fa-clock text-red-600 dark:text-red-300"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pagos Pendientes</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="pagos-pendientes">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas y notificaciones -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4">Alertas Recientes</h3>
+                    <div id="alertas-container" class="space-y-3">
+                        <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                            <i class="fas fa-bell-slash text-3xl mb-2"></i>
+                            <p>No hay alertas pendientes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4">Ocupación de Combis</h3>
+                    <div id="ocupacion-container" class="space-y-3">
+                        <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+                            <i class="fas fa-bus text-3xl mb-2"></i>
+                            <p>No hay viajes programados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combis Section -->
+        <div id="combis-section" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Gestión de Combis</h2>
+                <button onclick="showCombiForm()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Nueva Combi
+                </button>
+            </div>
+
+            <!-- Formulario de Combi -->
+            <div id="combi-form" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6 hidden">
+                <h3 class="text-xl font-semibold mb-4">Registrar Nueva Combi</h3>
+                <form id="combi-form-element" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Identificador de Combi</label>
+                        <input type="text" id="combi-id" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Ej: COMBI-001" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Total de Asientos</label>
+                        <select id="combi-asientos" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" onchange="updateSeatLayout()" required>
+                            <option value="16">16 asientos (4x4)</option>
+                            <option value="20">20 asientos (4x5)</option>
+                            <option value="24">24 asientos (4x6)</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium mb-2">Distribución de Asientos</label>
+                        <div id="seat-layout-preview" class="combo-layout">
+                            <!-- Layout will be generated here -->
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 flex gap-4">
+                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                            Guardar Combi
+                        </button>
+                        <button type="button" onclick="hideCombiForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de Combis -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4">Combis Registradas</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="text-left py-3">ID Combi</th>
+                                    <th class="text-left py-3">Asientos</th>
+                                    <th class="text-left py-3">Estado</th>
+                                    <th class="text-left py-3">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="combis-list">
+                                <!-- Dynamic content will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Choferes Section -->
+        <div id="choferes-section" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Gestión de Choferes</h2>
+                <button onclick="showChoferForm()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Nuevo Chofer
+                </button>
+            </div>
+
+            <!-- Formulario de Chofer -->
+            <div id="chofer-form" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6 hidden">
+                <h3 class="text-xl font-semibold mb-4">Registrar Nuevo Chofer</h3>
+                <form id="chofer-form-element" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nombre Completo</label>
+                        <input type="text" id="chofer-nombre" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Nombre completo del chofer" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Número de Teléfono</label>
+                        <input type="tel" id="chofer-telefono" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="999-123-4567" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Licencia de Conducir</label>
+                        <input type="text" id="chofer-licencia" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Número de licencia" required>
+                    </div>
+                    <div class="md:col-span-2 flex gap-4">
+                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                            Guardar Chofer
+                        </button>
+                        <button type="button" onclick="hideChoferForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de Choferes -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4">Choferes Registrados</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="text-left py-3">Nombre</th>
+                                    <th class="text-left py-3">Teléfono</th>
+                                    <th class="text-left py-3">Licencia</th>
+                                    <th class="text-left py-3">Estado</th>
+                                    <th class="text-left py-3">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="choferes-list">
+                                <!-- Dynamic content will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rutas Section -->
+        <div id="rutas-section" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Gestión de Rutas y Horarios</h2>
+                <button onclick="showRutaForm()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Nueva Ruta
+                </button>
+            </div>
+
+            <!-- Formulario de Ruta -->
+            <div id="ruta-form" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6 hidden">
+                <h3 class="text-xl font-semibold mb-4">Crear Nueva Ruta</h3>
+                <form id="ruta-form-element" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Punto de Origen</label>
+                        <input type="text" id="ruta-origen" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Ej: Dzitbalché" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Punto de Destino</label>
+                        <input type="text" id="ruta-destino" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Ej: Campeche" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Precio del Boleto ($)</label>
+                        <input type="number" id="ruta-precio" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="25" step="0.01" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Duración Estimada (mins)</label>
+                        <input type="number" id="ruta-duracion" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="90" required>
+                    </div>
+                    <div class="md:col-span-2 flex gap-4">
+                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                            Guardar Ruta
+                        </button>
+                        <button type="button" onclick="hideRutaForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Gestión de Horarios -->
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6">
+                <h3 class="text-xl font-semibold mb-4">Asignar Horarios</h3>
+                <form id="horario-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Ruta</label>
+                        <select id="horario-ruta" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" required>
+                            <option value="">Seleccionar ruta...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Horario de Salida</label>
+                        <input type="time" id="horario-salida" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Combi Asignada</label>
+                        <select id="horario-combi" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" required>
+                            <option value="">Seleccionar combi...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Chofer Asignado</label>
+                        <select id="horario-chofer" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" required>
+                            <option value="">Seleccionar chofer...</option>
+                        </select>
+                    </div>
+                    <div class="lg:col-span-4">
+                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                            Asignar Horario
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de Rutas y Horarios -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-4">Rutas Creadas</h3>
+                        <div id="rutas-list" class="space-y-3">
+                            <!-- Dynamic content will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-4">Horarios de Hoy</h3>
+                        <div id="horarios-list" class="space-y-3">
+                            <!-- Dynamic content will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservas Section -->
+        <div id="reservas-section" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Gestión de Reservas</h2>
+                <button onclick="showReservaForm()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Nueva Reserva
+                </button>
+            </div>
+
+            <!-- Formulario de Reserva -->
+            <div id="reserva-form" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6 hidden">
+                <h3 class="text-xl font-semibold mb-4">Crear Nueva Reserva</h3>
+                
+                <!-- Selección de Ruta y Horario -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Ruta</label>
+                        <select id="reserva-ruta" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" onchange="updateAvailableHorarios()" required>
+                            <option value="">Seleccionar ruta...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Horario</label>
+                        <select id="reserva-horario" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" onchange="loadSeatLayout()" required>
+                            <option value="">Seleccionar horario...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Selección de Asientos -->
+                <div id="seat-selection-container" class="mb-6 hidden">
+                    <h4 class="text-lg font-semibold mb-4">Seleccionar Asientos</h4>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <div id="seat-layout-container" class="combo-layout">
+                                <!-- Seat layout will be generated here -->
+                            </div>
+                        </div>
+                        <div>
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+                                        <span>Disponible</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                                        <span>Ocupado</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-primary rounded mr-2"></div>
+                                        <span>Seleccionado</span>
+                                    </div>
+                                </div>
+                                <div id="selected-seats-info" class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <h5 class="font-semibold mb-2">Asientos Seleccionados:</h5>
+                                    <div id="selected-seats-list" class="text-sm text-gray-600 dark:text-gray-400">
+                                        Ningún asiento seleccionado
+                                    </div>
+                                    <div id="total-price" class="mt-2 text-lg font-bold text-primary">
+                                        Total: $0.00
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del Pasajero -->
+                <div id="passenger-info-container" class="mb-6 hidden">
+                    <h4 class="text-lg font-semibold mb-4">Información del Pasajero</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Nombre Completo</label>
+                            <input type="text" id="pasajero-nombre" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Nombre completo del pasajero" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Número de Teléfono</label>
+                            <input type="tel" id="pasajero-telefono" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="999-123-4567" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Método de Pago -->
+                <div id="payment-method-container" class="mb-6 hidden">
+                    <h4 class="text-lg font-semibold mb-4">Método de Pago</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="flex items-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <input type="radio" name="payment-method" value="efectivo" class="mr-3">
+                            <div>
+                                <div class="font-medium">Pago en Efectivo</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">Reserva con validez de 24 horas</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <input type="radio" name="payment-method" value="transferencia" class="mr-3">
+                            <div>
+                                <div class="font-medium">Transferencia/Stripe</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">Pago inmediato en línea</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="flex gap-4">
+                    <button type="button" onclick="createReservation()" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                        Crear Reserva
+                    </button>
+                    <button type="button" onclick="hideReservaForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista de Reservas -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Reservas del Día</h3>
+                        <div class="flex gap-2">
+                            <button onclick="filterReservas('confirmadas')" class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-sm hover:bg-green-200 dark:hover:bg-green-800 transition-colors">Confirmadas</button>
+                            <button onclick="filterReservas('pendientes')" class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded text-sm hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors">Pendientes</button>
+                            <button onclick="filterReservas('canceladas')" class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded text-sm hover:bg-red-200 dark:hover:bg-red-800 transition-colors">Canceladas</button>
+                            <button onclick="filterReservas('todas')" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">Todas</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="text-left py-3">Reserva #</th>
+                                    <th class="text-left py-3">Pasajero</th>
+                                    <th class="text-left py-3">Ruta</th>
+                                    <th class="text-left py-3">Horario</th>
+                                    <th class="text-left py-3">Asientos</th>
+                                    <th class="text-left py-3">Total</th>
+                                    <th class="text-left py-3">Estado</th>
+                                    <th class="text-left py-3">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reservas-list">
+                                <!-- Dynamic content will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
