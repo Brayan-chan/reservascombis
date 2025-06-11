@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Combis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-dark': '#4B4ABF'
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <style>
+        .seat {
+            transition: all 0.2s ease;
+        }
+        .seat:hover {
+            transform: scale(1.1);
+        }
+        .seat-available {
+            background-color: #10B981;
+            cursor: pointer;
+        }
+        .seat-occupied {
+            background-color: #EF4444;
+            cursor: not-allowed;
+        }
+        .seat-selected {
+            background-color: #5D5CDE;
+        }
+        .combo-layout {
+            display: grid;
+            gap: 10px;
+            justify-content: center;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: linear-gradient(180deg, #f9fafb 0%, #ffffff 100%);
+        }
+        .dark .combo-layout {
+            background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+            border-color: #374151;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+    <!-- Navegación -->
+    <nav class="bg-primary text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold">Sistema de Gestión de Combis</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showSection('dashboard')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
+                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                    </button>
+                    <button onclick="showSection('combis')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
+                        <i class="fas fa-bus mr-2"></i>Combis
+                    </button>
+                    <button onclick="showSection('choferes')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
+                        <i class="fas fa-user-tie mr-2"></i>Choferes
+                    </button>
+                    <button onclick="showSection('rutas')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
+                        <i class="fas fa-route mr-2"></i>Rutas
+                    </button>
+                    <button onclick="showSection('reservas')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
+                        <i class="fas fa-ticket-alt mr-2"></i>Reservas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Sección Dashboard -->
+        <div id="dashboard-section" class="section">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard Administrativo</h2>
+                <p class="text-gray-600 dark:text-gray-400">Resumen general de la operación</p>
+            </div>
+
+            <!-- Métricas principales -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
+                            <i class="fas fa-users text-blue-600 dark:text-blue-300"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pasajeros Hoy</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="pasajeros-hoy">127</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 dark:bg-green-900">
+                            <i class="fas fa-dollar-sign text-green-600 dark:text-green-300"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Ingresos Hoy</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="ingresos-hoy">$3,180</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900">
+                            <i class="fas fa-bus text-yellow-600 dark:text-yellow-300"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Viajes Hoy</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="viajes-hoy">24</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-100 dark:bg-red-900">
+                            <i class="fas fa-clock text-red-600 dark:text-red-300"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pagos Pendientes</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="pagos-pendientes">8</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas y notificaciones -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4">Alertas Recientes</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                            <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
+                            <div>
+                                <p class="font-medium">Pago pendiente</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Reserva #1234 vence en 2 horas</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <i class="fas fa-info-circle text-blue-600 mr-3"></i>
+                            <div>
+                                <p class="font-medium">Viaje próximo</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Dzitbalché - Campeche 14:30</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4">Ocupación de Combis</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span>Combi 001 (14:30)</span>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: 85%"></div>
+                                </div>
+                                <span class="text-sm">17/20</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Combi 002 (16:00)</span>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
+                                    <div class="bg-yellow-600 h-2 rounded-full" style="width: 60%"></div>
+                                </div>
+                                <span class="text-sm">12/20</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Combi 003 (18:30)</span>
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
+                                    <div class="bg-red-600 h-2 rounded-full" style="width: 100%"></div>
+                                </div>
+                                <span class="text-sm">20/20</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección Combis -->
+        <div id="combis-section" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Gestión de Combis</h2>
+                <button onclick="showCombiForm()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Nueva Combi
+                </button>
+            </div>
+
+            <!-- Formulario de Combi -->
+            <div id="combi-form" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6 hidden">
+                <h3 class="text-xl font-semibold mb-4">Registrar Nueva Combi</h3>
+                <form id="combi-form-element" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Identificador de Combi</label>
+                        <input type="text" id="combi-id" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Ej: COMBI-001">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Total de Asientos</label>
+                        <select id="combi-asientos" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" onchange="updateSeatLayout()">
+                            <option value="16">16 asientos (4x4)</option>
+                            <option value="20">20 asientos (4x5)</option>
+                            <option value="24">24 asientos (4x6)</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium mb-2">Distribución de Asientos</label>
+                        <div id="seat-layout-preview" class="combo-layout">
+                            <!-- Estos elementos se agregan dinámicamente -->
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 flex gap-4">
+                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                            Guardar Combi
+                        </button>
+                        <button type="button" onclick="hideCombiForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de Combis -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4">Combis Registradas</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="text-left py-3">ID Combi</th>
+                                    <th class="text-left py-3">Asientos</th>
+                                    <th class="text-left py-3">Estado</th>
+                                    <th class="text-left py-3">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="combis-list">
+                                <tr class="border-b border-gray-100 dark:border-gray-800">
+                                    <td class="py-3 font-medium">COMBI-001</td>
+                                    <td class="py-3">20</td>
+                                    <td class="py-3"><span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-sm">Activa</span></td>
+                                    <td class="py-3">
+                                        <button class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-100 dark:border-gray-800">
+                                    <td class="py-3 font-medium">COMBI-002</td>
+                                    <td class="py-3">16</td>
+                                    <td class="py-3"><span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-sm">Activa</span></td>
+                                    <td class="py-3">
+                                        <button class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Choferes -->
+        <div id="choferes-section" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Gestión de Choferes</h2>
+                <button onclick="showChoferForm()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Nuevo Chofer
+                </button>
+            </div>
+
+            <!-- Formulario de Chofer -->
+            <div id="chofer-form" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6 hidden">
+                <h3 class="text-xl font-semibold mb-4">Registrar Nuevo Chofer</h3>
+                <form id="chofer-form-element" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nombre Completo</label>
+                        <input type="text" id="chofer-nombre" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Nombre completo del chofer">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Número de Teléfono</label>
+                        <input type="tel" id="chofer-telefono" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="999-123-4567">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Licencia de Conducir</label>
+                        <input type="text" id="chofer-licencia" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Número de licencia">
+                    </div>
+                    <div class="md:col-span-2 flex gap-4">
+                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                            Guardar Chofer
+                        </button>
+                        <button type="button" onclick="hideChoferForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de Choferes -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4">Choferes Registrados</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="text-left py-3">Nombre</th>
+                                    <th class="text-left py-3">Teléfono</th>
+                                    <th class="text-left py-3">Licencia</th>
+                                    <th class="text-left py-3">Estado</th>
+                                    <th class="text-left py-3">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="choferes-list">
+                                <tr class="border-b border-gray-100 dark:border-gray-800">
+                                    <td class="py-3 font-medium">Juan Pérez García</td>
+                                    <td class="py-3">999-123-4567</td>
+                                    <td class="py-3">LIC123456</td>
+                                    <td class="py-3"><span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-sm">Disponible</span></td>
+                                    <td class="py-3">
+                                        <button class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-100 dark:border-gray-800">
+                                    <td class="py-3 font-medium">María González López</td>
+                                    <td class="py-3">999-987-6543</td>
+                                    <td class="py-3">LIC789012</td>
+                                    <td class="py-3"><span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded text-sm">En Ruta</span></td>
+                                    <td class="py-3">
+                                        <button class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Rutas -->
+        <div id="rutas-section" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Gestión de Rutas y Horarios</h2>
+                <button onclick="showRutaForm()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Nueva Ruta
+                </button>
+            </div>
+
+            <!-- Formulario de Ruta -->
+            <div id="ruta-form" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6 hidden">
+                <h3 class="text-xl font-semibold mb-4">Crear Nueva Ruta</h3>
+                <form id="ruta-form-element" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Punto de Origen</label>
+                        <input type="text" id="ruta-origen" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Ej: Dzitbalché">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Punto de Destino</label>
+                        <input type="text" id="ruta-destino" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Ej: Campeche">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Precio del Boleto ($)</label>
+                        <input type="number" id="ruta-precio" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="25" step="0.01">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Duración Estimada (mins)</label>
+                        <input type="number" id="ruta-duracion" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="90">
+                    </div>
+                    <div class="md:col-span-2 flex gap-4">
+                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                            Guardar Ruta
+                        </button>
+                        <button type="button" onclick="hideRutaForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Gestión de Horarios -->
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6">
+                <h3 class="text-xl font-semibold mb-4">Asignar Horarios</h3>
+                <form id="horario-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Ruta</label>
+                        <select id="horario-ruta" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base">
+                            <option>Dzitbalché - Campeche</option>
+                            <option>Campeche - Dzitbalché</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Horario de Salida</label>
+                        <input type="time" id="horario-salida" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Combi Asignada</label>
+                        <select id="horario-combi" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base">
+                            <option>COMBI-001</option>
+                            <option>COMBI-002</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Chofer Asignado</label>
+                        <select id="horario-chofer" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base">
+                            <option>Juan Pérez García</option>
+                            <option>María González López</option>
+                        </select>
+                    </div>
+                    <div class="lg:col-span-4">
+                        <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                            Asignar Horario
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de Rutas y Horarios -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-4">Rutas Creadas</h3>
+                        <div class="space-y-3">
+                            <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold">Dzitbalché - Campeche</h4>
+                                    <span class="text-primary font-bold">$25.00</span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Duración: 90 minutos</p>
+                                <div class="flex gap-2 mt-2">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-edit mr-1"></i>Editar</button>
+                                    <button class="text-red-600 hover:text-red-800 text-sm"><i class="fas fa-trash mr-1"></i>Eliminar</button>
+                                </div>
+                            </div>
+                            <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold">Campeche - Dzitbalché</h4>
+                                    <span class="text-primary font-bold">$25.00</span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Duración: 90 minutos</p>
+                                <div class="flex gap-2 mt-2">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-edit mr-1"></i>Editar</button>
+                                    <button class="text-red-600 hover:text-red-800 text-sm"><i class="fas fa-trash mr-1"></i>Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-4">Horarios de Hoy</h3>
+                        <div class="space-y-3">
+                            <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-semibold">14:30 - Dzitbalché → Campeche</h4>
+                                    <span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded text-sm">17/20</span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">COMBI-001 - Juan Pérez García</p>
+                                <div class="flex gap-2 mt-2">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-eye mr-1"></i>Ver</button>
+                                    <button class="text-red-600 hover:text-red-800 text-sm"><i class="fas fa-ban mr-1"></i>Cancelar</button>
+                                </div>
+                            </div>
+                            <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-semibold">16:00 - Campeche → Dzitbalché</h4>
+                                    <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-sm">12/20</span>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">COMBI-002 - María González López</p>
+                                <div class="flex gap-2 mt-2">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-eye mr-1"></i>Ver</button>
+                                    <button class="text-red-600 hover:text-red-800 text-sm"><i class="fas fa-ban mr-1"></i>Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Reservas -->
+        <div id="reservas-section" class="section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Gestión de Reservas</h2>
+                <button onclick="showReservaForm()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Nueva Reserva
+                </button>
+            </div>
+
+            <!-- Formulario de Reserva -->
+            <div id="reserva-form" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 mb-6 hidden">
+                <h3 class="text-xl font-semibold mb-4">Crear Nueva Reserva</h3>
+                
+                <!-- Selección de Ruta y Horario -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Ruta</label>
+                        <select id="reserva-ruta" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" onchange="updateAvailableHorarios()">
+                            <option value="">Seleccionar ruta...</option>
+                            <option value="dzitbalche-campeche">Dzitbalché - Campeche</option>
+                            <option value="campeche-dzitbalche">Campeche - Dzitbalché</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Horario</label>
+                        <select id="reserva-horario" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" onchange="loadSeatLayout()">
+                            <option value="">Seleccionar horario...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Selección de Asientos -->
+                <div id="seat-selection-container" class="mb-6 hidden">
+                    <h4 class="text-lg font-semibold mb-4">Seleccionar Asientos</h4>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <div id="seat-layout-container" class="combo-layout">
+                                <!-- Estos elementos se agregan dinámicamente -->
+                            </div>
+                        </div>
+                        <div>
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-4 text-sm">
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+                                        <span>Disponible</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                                        <span>Ocupado</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 bg-primary rounded mr-2"></div>
+                                        <span>Seleccionado</span>
+                                    </div>
+                                </div>
+                                <div id="selected-seats-info" class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <h5 class="font-semibold mb-2">Asientos Seleccionados:</h5>
+                                    <div id="selected-seats-list" class="text-sm text-gray-600 dark:text-gray-400">
+                                        Ningún asiento seleccionado
+                                    </div>
+                                    <div id="total-price" class="mt-2 text-lg font-bold text-primary">
+                                        Total: $0.00
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del Pasajero -->
+                <div id="passenger-info-container" class="mb-6 hidden">
+                    <h4 class="text-lg font-semibold mb-4">Información del Pasajero</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Nombre Completo</label>
+                            <input type="text" id="pasajero-nombre" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="Nombre completo del pasajero">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Número de Teléfono</label>
+                            <input type="tel" id="pasajero-telefono" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-base" placeholder="999-123-4567">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Método de Pago -->
+                <div id="payment-method-container" class="mb-6 hidden">
+                    <h4 class="text-lg font-semibold mb-4">Método de Pago</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="flex items-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <input type="radio" name="payment-method" value="efectivo" class="mr-3">
+                            <div>
+                                <div class="font-medium">Pago en Efectivo</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">Reserva con validez de 24 horas</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <input type="radio" name="payment-method" value="transferencia" class="mr-3">
+                            <div>
+                                <div class="font-medium">Transferencia/Stripe</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">Pago inmediato en línea</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="flex gap-4">
+                    <button type="button" onclick="createReservation()" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg transition-colors">
+                        Crear Reserva
+                    </button>
+                    <button type="button" onclick="hideReservaForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista de Reservas -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">Reservas del Día</h3>
+                        <div class="flex gap-2">
+                            <button class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-sm">Confirmadas</button>
+                            <button class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded text-sm">Pendientes</button>
+                            <button class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded text-sm">Canceladas</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="text-left py-3">Reserva #</th>
+                                    <th class="text-left py-3">Pasajero</th>
+                                    <th class="text-left py-3">Ruta</th>
+                                    <th class="text-left py-3">Horario</th>
+                                    <th class="text-left py-3">Asiento</th>
+                                    <th class="text-left py-3">Estado</th>
+                                    <th class="text-left py-3">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reservas-list">
+                                <tr class="border-b border-gray-100 dark:border-gray-800">
+                                    <td class="py-3 font-medium">#1234</td>
+                                    <td class="py-3">
+                                        <div>
+                                            <div class="font-medium">Ana García</div>
+                                            <div class="text-sm text-gray-600 dark:text-gray-400">999-123-4567</div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">Dzitbalché - Campeche</td>
+                                    <td class="py-3">14:30</td>
+                                    <td class="py-3">A1</td>
+                                    <td class="py-3"><span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-sm">Confirmada</span></td>
+                                    <td class="py-3">
+                                        <button class="text-blue-600 hover:text-blue-800 mr-2" title="Imprimir boleto"><i class="fas fa-print"></i></button>
+                                        <button class="text-green-600 hover:text-green-800 mr-2" title="Enviar WhatsApp"><i class="fas fa-whatsapp"></i></button>
+                                        <button class="text-red-600 hover:text-red-800" title="Cancelar"><i class="fas fa-times"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-100 dark:border-gray-800">
+                                    <td class="py-3 font-medium">#1235</td>
+                                    <td class="py-3">
+                                        <div>
+                                            <div class="font-medium">Carlos López</div>
+                                            <div class="text-sm text-gray-600 dark:text-gray-400">999-987-6543</div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">Dzitbalché - Campeche</td>
+                                    <td class="py-3">14:30</td>
+                                    <td class="py-3">A2</td>
+                                    <td class="py-3"><span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded text-sm">Pendiente Pago</span></td>
+                                    <td class="py-3">
+                                        <button class="text-green-600 hover:text-green-800 mr-2" title="Confirmar pago"><i class="fas fa-check"></i></button>
+                                        <button class="text-blue-600 hover:text-blue-800 mr-2" title="Enviar recordatorio"><i class="fas fa-bell"></i></button>
+                                        <button class="text-red-600 hover:text-red-800" title="Cancelar"><i class="fas fa-times"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Detección del modo oscuro
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Navegación
+        function showSection(sectionName) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Mostrar la sección correspondiente
+            document.getElementById(sectionName + '-section').classList.remove('hidden');
+
+            // Actualizar el botón de navegación activo
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-primary-dark');
+            });
+            event.target.closest('.nav-btn').classList.add('bg-primary-dark');
+        }
+
+        // Gestión de Combis
+        function showCombiForm() {
+            document.getElementById('combi-form').classList.remove('hidden');
+            updateSeatLayout();
+        }
+
+        function hideCombiForm() {
+            document.getElementById('combi-form').classList.add('hidden');
+        }
+
+        function updateSeatLayout() {
+            const asientos = document.getElementById('combi-asientos').value;
+            const container = document.getElementById('seat-layout-preview');
+            
+            let layout = '';
+            const rows = Math.ceil(asientos / 4);
+            
+            container.style.gridTemplateColumns = 'repeat(4, 1fr)';
+            
+            for (let i = 1; i <= asientos; i++) {
+                layout += `<div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-white text-xs font-bold">${i}</div>`;
+            }
+            
+            container.innerHTML = layout;
+        }
+
+        // Gestión de Choferes
+        function showChoferForm() {
+            document.getElementById('chofer-form').classList.remove('hidden');
+        }
+
+        function hideChoferForm() {
+            document.getElementById('chofer-form').classList.add('hidden');
+        }
+
+        // Gestión de Rutas
+        function showRutaForm() {
+            document.getElementById('ruta-form').classList.remove('hidden');
+        }
+
+        function hideRutaForm() {
+            document.getElementById('ruta-form').classList.add('hidden');
+        }
+
+        // Gestión de Reservas
+        let selectedSeats = [];
+        let currentPrice = 25.00;
+
+        function showReservaForm() {
+            document.getElementById('reserva-form').classList.remove('hidden');
+        }
+
+        function hideReservaForm() {
+            document.getElementById('reserva-form').classList.add('hidden');
+            selectedSeats = [];
+            updateSelectedSeatsDisplay();
+        }
+
+        function updateAvailableHorarios() {
+            const ruta = document.getElementById('reserva-ruta').value;
+            const horarioSelect = document.getElementById('reserva-horario');
+            
+            horarioSelect.innerHTML = '<option value="">Seleccionar horario...</option>';
+            
+            if (ruta === 'dzitbalche-campeche') {
+                horarioSelect.innerHTML += '<option value="14:30">14:30 - COMBI-001 (3 disponibles)</option>';
+                horarioSelect.innerHTML += '<option value="16:00">16:00 - COMBI-002 (8 disponibles)</option>';
+            } else if (ruta === 'campeche-dzitbalche') {
+                horarioSelect.innerHTML += '<option value="15:00">15:00 - COMBI-001 (5 disponibles)</option>';
+                horarioSelect.innerHTML += '<option value="17:30">17:30 - COMBI-002 (12 disponibles)</option>';
+            }
+        }
+
+        function loadSeatLayout() {
+            const horario = document.getElementById('reserva-horario').value;
+            if (!horario) return;
+            
+            document.getElementById('seat-selection-container').classList.remove('hidden');
+            document.getElementById('passenger-info-container').classList.remove('hidden');
+            document.getElementById('payment-method-container').classList.remove('hidden');
+            
+            const container = document.getElementById('seat-layout-container');
+            container.style.gridTemplateColumns = 'repeat(4, 1fr)';
+            
+            let layout = '';
+            const occupiedSeats = [1, 3, 7, 12, 15]; // Simulación de asientos ocupados
+
+            for (let i = 1; i <= 20; i++) {
+                const isOccupied = occupiedSeats.includes(i);
+                const seatClass = isOccupied ? 'seat-occupied' : 'seat-available';
+                layout += `<div class="seat w-10 h-10 ${seatClass} rounded flex items-center justify-center text-white text-sm font-bold" 
+                           onclick="${isOccupied ? '' : 'toggleSeat(' + i + ')'}">${i}</div>`;
+            }
+            
+            container.innerHTML = layout;
+        }
+
+        function toggleSeat(seatNumber) {
+            const seatElement = document.querySelector(`[onclick="toggleSeat(${seatNumber})"]`);
+            
+            if (selectedSeats.includes(seatNumber)) {
+                // Deseleccionar silla
+                selectedSeats = selectedSeats.filter(s => s !== seatNumber);
+                seatElement.classList.remove('seat-selected');
+                seatElement.classList.add('seat-available');
+            } else {
+                // Seleccionar silla
+                selectedSeats.push(seatNumber);
+                seatElement.classList.remove('seat-available');
+                seatElement.classList.add('seat-selected');
+            }
+            
+            updateSelectedSeatsDisplay();
+        }
+
+        function updateSelectedSeatsDisplay() {
+            const seatsList = document.getElementById('selected-seats-list');
+            const totalPrice = document.getElementById('total-price');
+            
+            if (selectedSeats.length === 0) {
+                seatsList.textContent = 'Ningún asiento seleccionado';
+                totalPrice.textContent = 'Total: $0.00';
+            } else {
+                seatsList.textContent = `Asientos: ${selectedSeats.join(', ')}`;
+                totalPrice.textContent = `Total: $${(selectedSeats.length * currentPrice).toFixed(2)}`;
+            }
+        }
+
+        function createReservation() {
+            const ruta = document.getElementById('reserva-ruta').value;
+            const horario = document.getElementById('reserva-horario').value;
+            const nombre = document.getElementById('pasajero-nombre').value;
+            const telefono = document.getElementById('pasajero-telefono').value;
+            const paymentMethod = document.querySelector('input[name="payment-method"]:checked');
+            
+            if (!ruta || !horario || !nombre || !telefono || selectedSeats.length === 0 || !paymentMethod) {
+                alert('Por favor complete todos los campos requeridos');
+                return;
+            }
+            
+            // Creación de simulación de reserva
+            const reservaId = Math.floor(Math.random() * 9000) + 1000;
+            const total = selectedSeats.length * currentPrice;
+            
+            let mensaje = `Reserva creada exitosamente!\n\n`;
+            mensaje += `ID de Reserva: #${reservaId}\n`;
+            mensaje += `Pasajero: ${nombre}\n`;
+            mensaje += `Teléfono: ${telefono}\n`;
+            mensaje += `Ruta: ${ruta}\n`;
+            mensaje += `Horario: ${horario}\n`;
+            mensaje += `Asientos: ${selectedSeats.join(', ')}\n`;
+            mensaje += `Total: $${total.toFixed(2)}\n`;
+            mensaje += `Método de Pago: ${paymentMethod.value === 'efectivo' ? 'Efectivo (24h validez)' : 'Transferencia/Stripe'}\n\n`;
+            
+            if (paymentMethod.value === 'efectivo') {
+                mensaje += 'Estado: Pendiente de Pago en Efectivo\n';
+                mensaje += 'La reserva tiene validez de 24 horas para completar el pago.';
+            } else {
+                mensaje += 'Estado: Pendiente de Pago en Línea\n';
+                mensaje += 'Se generará un link de pago de Stripe para el cliente.';
+            }
+            
+            alert(mensaje);
+
+            // Simular notificación por WhatsApp
+            setTimeout(() => {
+                alert(`📱 Notificación WhatsApp enviada a ${telefono}:\n\n"¡Hola ${nombre}! Tu reserva #${reservaId} ha sido creada. Asientos: ${selectedSeats.join(', ')}. Total: $${total.toFixed(2)}. ${paymentMethod.value === 'efectivo' ? 'Tienes 24 horas para completar el pago.' : 'Te enviaremos el link de pago.'}"`);
+            }, 1000);
+            
+            hideReservaForm();
+        }
+
+        // Subir información de formularios
+        document.getElementById('combi-form-element').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Combi registrada exitosamente!');
+            hideCombiForm();
+        });
+
+        document.getElementById('chofer-form-element').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Chofer registrado exitosamente!');
+            hideChoferForm();
+        });
+
+        document.getElementById('ruta-form-element').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Ruta creada exitosamente!');
+            hideRutaForm();
+        });
+
+        document.getElementById('horario-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Horario asignado exitosamente!');
+        });
+
+        // Inicializar la sección de dashboard al cargar la página
+        showSection('dashboard');
+    </script>
+</body>
+</html>
