@@ -1,0 +1,116 @@
+.seat {
+  transition: all 0.2s ease;
+}
+
+.seat:hover {
+  transform: scale(1.1);
+}
+
+.seat-available {
+  background-color: #10b981;
+  cursor: pointer;
+}
+
+.seat-occupied {
+  background-color: #ef4444;
+  cursor: not-allowed;
+}
+
+.seat-selected {
+  background-color: #5d5cde;
+}
+
+.combo-layout {
+  display: grid;
+  gap: 10px;
+  justify-content: center;
+  padding: 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #f9fafb 0%, #ffffff 100%);
+}
+
+.dark .combo-layout {
+  background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+  border-color: #374151;
+}
+
+/* Loading animation */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #6b7280;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .combo-layout {
+    padding: 15px;
+    gap: 8px;
+  }
+
+  .seat {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 12px;
+  }
+}
+
+/* Print styles for tickets */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-ticket,
+  .print-ticket * {
+    visibility: visible;
+  }
+
+  .print-ticket {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
