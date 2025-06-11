@@ -6,6 +6,8 @@
     <title>Sistema de Gestión de Combis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -53,36 +55,61 @@
     </style>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-    <!-- Navegación -->
-    <nav class="bg-primary text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <h1 class="text-xl font-bold">Sistema de Gestión de Combis</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <button onclick="showSection('dashboard')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
-                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
-                    </button>
-                    <button onclick="showSection('combis')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
-                        <i class="fas fa-bus mr-2"></i>Combis
-                    </button>
-                    <button onclick="showSection('choferes')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
-                        <i class="fas fa-user-tie mr-2"></i>Choferes
-                    </button>
-                    <button onclick="showSection('rutas')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
-                        <i class="fas fa-route mr-2"></i>Rutas
-                    </button>
-                    <button onclick="showSection('reservas')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-dark transition-colors">
-                        <i class="fas fa-ticket-alt mr-2"></i>Reservas
-                    </button>
-                </div>
+    <!-- Navigation Responsive -->
+    <nav class="bg-primary border-gray-200 dark:bg-gray-900">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
+                <i class="fas fa-bus text-2xl text-white"></i>
+                <span class="self-center text-xl font-semibold whitespace-nowrap text-white">Sistema de Combis</span>
+            </a>
+            <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg md:hidden hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
+                <span class="sr-only">Abrir menú principal</span>
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                </svg>
+            </button>
+            <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+                <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-primary md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-primary dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                    <li>
+                        <button onclick="showSection('dashboard')" class="nav-btn block py-2 px-3 text-white bg-primary-dark rounded md:bg-transparent md:text-white md:p-0 md:hover:text-gray-200 transition-colors" aria-current="page">
+                            <i class="fas fa-tachometer-alt mr-2"></i>
+                            <span class="md:hidden lg:inline">Dashboard</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('combis')" class="nav-btn block py-2 px-3 text-white rounded hover:bg-primary-dark md:hover:bg-transparent md:border-0 md:hover:text-gray-200 md:p-0 transition-colors">
+                            <i class="fas fa-bus mr-2"></i>
+                            <span class="md:hidden lg:inline">Combis</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('choferes')" class="nav-btn block py-2 px-3 text-white rounded hover:bg-primary-dark md:hover:bg-transparent md:border-0 md:hover:text-gray-200 md:p-0 transition-colors">
+                            <i class="fas fa-user-tie mr-2"></i>
+                            <span class="md:hidden lg:inline">Choferes</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('rutas')" class="nav-btn block py-2 px-3 text-white rounded hover:bg-primary-dark md:hover:bg-transparent md:border-0 md:hover:text-gray-200 md:p-0 transition-colors">
+                            <i class="fas fa-route mr-2"></i>
+                            <span class="md:hidden lg:inline">Rutas</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('reservas')" class="nav-btn block py-2 px-3 text-white rounded hover:bg-primary-dark md:hover:bg-transparent md:border-0 md:hover:text-gray-200 md:p-0 transition-colors">
+                            <i class="fas fa-ticket-alt mr-2"></i>
+                            <span class="md:hidden lg:inline">Reservas</span>
+                        </button>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
+    <!-- Toast Container for Custom Alerts -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Sección Dashboard -->
+        <!-- Dashboard Section -->
         <div id="dashboard-section" class="section">
             <div class="mb-8">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard Administrativo</h2>
@@ -197,7 +224,7 @@
             </div>
         </div>
 
-        <!-- Sección Combis -->
+        <!-- Combis Section -->
         <div id="combis-section" class="section hidden">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-3xl font-bold">Gestión de Combis</h2>
@@ -225,7 +252,7 @@
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium mb-2">Distribución de Asientos</label>
                         <div id="seat-layout-preview" class="combo-layout">
-                            <!-- Estos elementos se agregan dinámicamente -->
+                            <!-- Layout will be generated here -->
                         </div>
                     </div>
                     <div class="md:col-span-2 flex gap-4">
@@ -279,7 +306,7 @@
             </div>
         </div>
 
-        <!-- Sección de Choferes -->
+        <!-- Choferes Section -->
         <div id="choferes-section" class="section hidden">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-3xl font-bold">Gestión de Choferes</h2>
@@ -358,7 +385,7 @@
             </div>
         </div>
 
-        <!-- Sección de Rutas -->
+        <!-- Rutas Section -->
         <div id="rutas-section" class="section hidden">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-3xl font-bold">Gestión de Rutas y Horarios</h2>
@@ -499,7 +526,7 @@
             </div>
         </div>
 
-        <!-- Sección de Reservas -->
+        <!-- Reservas Section -->
         <div id="reservas-section" class="section hidden">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-3xl font-bold">Gestión de Reservas</h2>
@@ -536,7 +563,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div>
                             <div id="seat-layout-container" class="combo-layout">
-                                <!-- Estos elementos se agregan dinámicamente -->
+                                <!-- Seat layout will be generated here -->
                             </div>
                         </div>
                         <div>
@@ -686,7 +713,7 @@
     </div>
 
     <script>
-        // Detección del modo oscuro
+        // Dark mode detection
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark');
         }
@@ -698,24 +725,24 @@
             }
         });
 
-        // Navegación
+        // Navigation
         function showSection(sectionName) {
-            // Ocultar todas las secciones
+            // Hide all sections
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.add('hidden');
             });
             
-            // Mostrar la sección correspondiente
+            // Show selected section
             document.getElementById(sectionName + '-section').classList.remove('hidden');
-
-            // Actualizar el botón de navegación activo
+            
+            // Update active nav button
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('bg-primary-dark');
             });
             event.target.closest('.nav-btn').classList.add('bg-primary-dark');
         }
 
-        // Gestión de Combis
+        // Combis Management
         function showCombiForm() {
             document.getElementById('combi-form').classList.remove('hidden');
             updateSeatLayout();
@@ -741,7 +768,7 @@
             container.innerHTML = layout;
         }
 
-        // Gestión de Choferes
+        // Choferes Management
         function showChoferForm() {
             document.getElementById('chofer-form').classList.remove('hidden');
         }
@@ -750,7 +777,7 @@
             document.getElementById('chofer-form').classList.add('hidden');
         }
 
-        // Gestión de Rutas
+        // Rutas Management
         function showRutaForm() {
             document.getElementById('ruta-form').classList.remove('hidden');
         }
@@ -759,7 +786,7 @@
             document.getElementById('ruta-form').classList.add('hidden');
         }
 
-        // Gestión de Reservas
+        // Reservas Management
         let selectedSeats = [];
         let currentPrice = 25.00;
 
@@ -800,8 +827,8 @@
             container.style.gridTemplateColumns = 'repeat(4, 1fr)';
             
             let layout = '';
-            const occupiedSeats = [1, 3, 7, 12, 15]; // Simulación de asientos ocupados
-
+            const occupiedSeats = [1, 3, 7, 12, 15]; // Simulated occupied seats
+            
             for (let i = 1; i <= 20; i++) {
                 const isOccupied = occupiedSeats.includes(i);
                 const seatClass = isOccupied ? 'seat-occupied' : 'seat-available';
@@ -816,12 +843,12 @@
             const seatElement = document.querySelector(`[onclick="toggleSeat(${seatNumber})"]`);
             
             if (selectedSeats.includes(seatNumber)) {
-                // Deseleccionar silla
+                // Deselect seat
                 selectedSeats = selectedSeats.filter(s => s !== seatNumber);
                 seatElement.classList.remove('seat-selected');
                 seatElement.classList.add('seat-available');
             } else {
-                // Seleccionar silla
+                // Select seat
                 selectedSeats.push(seatNumber);
                 seatElement.classList.remove('seat-available');
                 seatElement.classList.add('seat-selected');
@@ -851,67 +878,148 @@
             const paymentMethod = document.querySelector('input[name="payment-method"]:checked');
             
             if (!ruta || !horario || !nombre || !telefono || selectedSeats.length === 0 || !paymentMethod) {
-                alert('Por favor complete todos los campos requeridos');
+                showToast('⚠️ Por favor complete todos los campos requeridos', 'warning');
                 return;
             }
             
-            // Creación de simulación de reserva
+            // Simulate reservation creation
             const reservaId = Math.floor(Math.random() * 9000) + 1000;
             const total = selectedSeats.length * currentPrice;
             
-            let mensaje = `Reserva creada exitosamente!\n\n`;
-            mensaje += `ID de Reserva: #${reservaId}\n`;
-            mensaje += `Pasajero: ${nombre}\n`;
-            mensaje += `Teléfono: ${telefono}\n`;
-            mensaje += `Ruta: ${ruta}\n`;
-            mensaje += `Horario: ${horario}\n`;
-            mensaje += `Asientos: ${selectedSeats.join(', ')}\n`;
-            mensaje += `Total: $${total.toFixed(2)}\n`;
-            mensaje += `Método de Pago: ${paymentMethod.value === 'efectivo' ? 'Efectivo (24h validez)' : 'Transferencia/Stripe'}\n\n`;
+            // Show success notification
+            const statusText = paymentMethod.value === 'efectivo' ? 'Pendiente de Pago (24h)' : 'Pendiente de Pago Online';
+            showToast(`🎫 Reserva #${reservaId} creada - ${statusText}`, 'success', 6000);
             
-            if (paymentMethod.value === 'efectivo') {
-                mensaje += 'Estado: Pendiente de Pago en Efectivo\n';
-                mensaje += 'La reserva tiene validez de 24 horas para completar el pago.';
-            } else {
-                mensaje += 'Estado: Pendiente de Pago en Línea\n';
-                mensaje += 'Se generará un link de pago de Stripe para el cliente.';
-            }
-            
-            alert(mensaje);
-
-            // Simular notificación por WhatsApp
+            // Show reservation details
             setTimeout(() => {
-                alert(`📱 Notificación WhatsApp enviada a ${telefono}:\n\n"¡Hola ${nombre}! Tu reserva #${reservaId} ha sido creada. Asientos: ${selectedSeats.join(', ')}. Total: $${total.toFixed(2)}. ${paymentMethod.value === 'efectivo' ? 'Tienes 24 horas para completar el pago.' : 'Te enviaremos el link de pago.'}"`);
+                showToast(`👤 ${nombre} | 🪑 Asientos: ${selectedSeats.join(', ')} | 💰 $${total.toFixed(2)}`, 'info', 8000);
             }, 1000);
+            
+            // Simulate WhatsApp notification
+            setTimeout(() => {
+                showWhatsAppNotification(telefono, nombre, reservaId, selectedSeats, total, paymentMethod.value);
+            }, 2000);
             
             hideReservaForm();
         }
 
-        // Subir información de formularios
+        // Custom Toast Notification System
+        function showToast(message, type = 'success', duration = 4000) {
+            const toastContainer = document.getElementById('toast-container');
+            const toastId = 'toast-' + Date.now();
+            
+            const toastTypes = {
+                success: {
+                    bgColor: 'bg-green-100 dark:bg-green-800',
+                    textColor: 'text-green-500 dark:text-green-200',
+                    borderColor: 'border-green-500',
+                    icon: 'fas fa-check-circle'
+                },
+                error: {
+                    bgColor: 'bg-red-100 dark:bg-red-800',
+                    textColor: 'text-red-500 dark:text-red-200',
+                    borderColor: 'border-red-500',
+                    icon: 'fas fa-exclamation-circle'
+                },
+                warning: {
+                    bgColor: 'bg-yellow-100 dark:bg-yellow-800',
+                    textColor: 'text-yellow-500 dark:text-yellow-200',
+                    borderColor: 'border-yellow-500',
+                    icon: 'fas fa-exclamation-triangle'
+                },
+                info: {
+                    bgColor: 'bg-blue-100 dark:bg-blue-800',
+                    textColor: 'text-blue-500 dark:text-blue-200',
+                    borderColor: 'border-blue-500',
+                    icon: 'fas fa-info-circle'
+                }
+            };
+            
+            const toast = toastTypes[type] || toastTypes.info;
+            
+            const toastHTML = `
+                <div id="${toastId}" class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 ${toast.bgColor} rounded-lg shadow dark:text-gray-400 dark:bg-gray-800 border-l-4 ${toast.borderColor} transform transition-all duration-300 ease-in-out translate-x-full opacity-0" role="alert">
+                    <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${toast.textColor} rounded-lg">
+                        <i class="${toast.icon}"></i>
+                    </div>
+                    <div class="ml-3 text-sm font-normal text-gray-900 dark:text-white">${message}</div>
+                    <button type="button" class="ml-auto -mx-1.5 -my-1.5 ${toast.bgColor} text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="closeToast('${toastId}')" aria-label="Close">
+                        <span class="sr-only">Close</span>
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            
+            // Animate in
+            setTimeout(() => {
+                const toastElement = document.getElementById(toastId);
+                if (toastElement) {
+                    toastElement.classList.remove('translate-x-full', 'opacity-0');
+                    toastElement.classList.add('translate-x-0', 'opacity-100');
+                }
+            }, 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                closeToast(toastId);
+            }, duration);
+        }
+        
+        function closeToast(toastId) {
+            const toastElement = document.getElementById(toastId);
+            if (toastElement) {
+                toastElement.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => {
+                    toastElement.remove();
+                }, 300);
+            }
+        }
+
+        // WhatsApp notification system
+        function showWhatsAppNotification(telefono, nombre, reservaId, asientos, total, paymentMethod) {
+            const whatsappMessage = `¡Hola ${nombre}! Tu reserva #${reservaId} ha sido creada. Asientos: ${asientos.join(', ')}. Total: $${total.toFixed(2)}. ${paymentMethod === 'efectivo' ? 'Tienes 24 horas para completar el pago.' : 'Te enviaremos el link de pago.'}`;
+            
+            showToast(`📱 WhatsApp enviado a ${telefono}`, 'info', 5000);
+            
+            // Simulate actual WhatsApp API call
+            setTimeout(() => {
+                console.log('WhatsApp message sent:', whatsappMessage);
+            }, 1000);
+        }
+
+        // Form submissions with custom alerts
         document.getElementById('combi-form-element').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Combi registrada exitosamente!');
+            const combiId = document.getElementById('combi-id').value;
+            showToast(`✅ Combi ${combiId} registrada exitosamente!`, 'success');
             hideCombiForm();
         });
 
         document.getElementById('chofer-form-element').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Chofer registrado exitosamente!');
+            const choferNombre = document.getElementById('chofer-nombre').value;
+            showToast(`✅ Chofer ${choferNombre} registrado exitosamente!`, 'success');
             hideChoferForm();
         });
 
         document.getElementById('ruta-form-element').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Ruta creada exitosamente!');
+            const origen = document.getElementById('ruta-origen').value;
+            const destino = document.getElementById('ruta-destino').value;
+            showToast(`✅ Ruta ${origen} - ${destino} creada exitosamente!`, 'success');
             hideRutaForm();
         });
 
         document.getElementById('horario-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Horario asignado exitosamente!');
+            const ruta = document.getElementById('horario-ruta').value;
+            const horario = document.getElementById('horario-salida').value;
+            showToast(`✅ Horario ${horario} asignado para ${ruta}!`, 'success');
         });
 
-        // Inicializar la sección de dashboard al cargar la página
+        // Initialize with dashboard
         showSection('dashboard');
     </script>
 </body>
